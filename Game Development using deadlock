@@ -1,0 +1,95 @@
+import pygame
+import random
+
+# Initialize Pygame
+pygame.init()
+
+# Screen dimensions
+WIDTH, HEIGHT = 800, 600
+
+# Initialize the screen
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Car Race Game")
+
+# Car properties
+CAR_WIDTH = 20
+CAR_HEIGHT = 40
+
+# Define the Car class
+class Car:
+    def _init_(self, color, speed, direction):
+        self.image = pygame.Surface((CAR_WIDTH, CAR_HEIGHT))
+        self.image.fill(color)
+        self.rect = self.image.get_rect()
+        self.speed = speed
+        self.direction = direction
+
+        if direction == "horizontal":
+            self.rect.x = random.randint(0, WIDTH - CAR_WIDTH)
+            self.rect.y = random.randint(0, HEIGHT - CAR_HEIGHT)
+        elif direction == "vertical":
+            self.rect.x = random.randint(0, WIDTH - CAR_WIDTH)
+            self.rect.y = random.randint(0, HEIGHT - CAR_HEIGHT)
+
+    def move(self):
+        if self.direction == "horizontal":
+            self.rect.x += self.speed
+            if self.rect.left < 0 or self.rect.right > WIDTH:
+                self.speed *= -1
+        elif self.direction == "vertical":
+            self.rect.y += self.speed
+            if self.rect.top < 0 or self.rect.bottom > HEIGHT:
+                self.speed *= -1
+
+# Initialize cars with random colors, speeds, and directions
+car1 = Car((255, 0, 0), random.uniform(1, 4), random.choice(["horizontal", "vertical"]))  # Red
+car2 = Car((0, 0, 255), random.uniform(1, 4), random.choice(["horizontal", "vertical"]))  # Blue
+car3 = Car((0, 255, 0), random.uniform(1, 4), random.choice(["horizontal", "vertical"]))  # Green
+car4 = Car((255, 255, 0), random.uniform(1, 4), random.choice(["horizontal", "vertical"]))  # Yellow
+car5 = Car((255, 0, 255), random.uniform(1, 4), random.choice(["horizontal", "vertical"]))  # Magenta
+
+cars = [car1, car2, car3, car4, car5]
+
+# Game loop
+def reset_game():
+    for car in cars:
+        car.speed = random.uniform(1, 4)
+        car.direction = random.choice(["horizontal", "vertical"])
+        if car.direction == "horizontal":
+            car.rect.x = random.randint(0, WIDTH - car.rect.width)
+            car.rect.y = random.randint(0, HEIGHT - car.rect.height)
+        elif car.direction == "vertical":
+            car.rect.x = random.randint(0, WIDTH - car.rect.width)
+            car.rect.y = random.randint(0, HEIGHT - car.rect.height)
+
+reset_game()  # Initial game setup
+
+running = True
+while running:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+
+    # Update car positions and directions
+    for car in cars:
+        car.move()
+
+    # Check for collisions
+    for i in range(len(cars)):
+        for j in range(i + 1, len(cars)):
+            if cars[i].rect.colliderect(cars[j].rect):
+                print("Deadlock! Restarting the game.")
+                reset_game()
+
+    # Clear the screen
+    screen.fill((0, 0, 0))
+
+    # Draw cars
+    for car in cars:
+        screen.blit(car.image, car.rect)
+
+    # Update the display
+    pygame.display.flip()
+
+# Quit Pygame
+pygame.quit()
